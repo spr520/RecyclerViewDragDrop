@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 23
     buildToolsVersion "24.0.0"
 
     defaultConfig {
         applicationId "com.spr.ninegridrecyclerview"
-        minSdkVersion 15
+        minSdkVersion 23
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"

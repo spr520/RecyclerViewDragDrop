@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/Game"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <FrameLayout
+        android:id="@+id/GameField"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/Button00"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:background="@android:color/transparent"
+            android:textSize="48px"></Button>
+
+        <Button
+            android:id="@+id/Button01"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:text="1"
+            android:textSize="48px"></Button>
+
+        <Button
+            android:id="@+id/Button02"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:text="2"
+            android:textSize="48px"></Button>
+
+        <Button
+            android:id="@+id/Button03"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:text="3"
+            android:textSize="48px"></Button>
+
+        <Button
+            android:id="@+id/Button04"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:text="4"
+            android:textSize="48px"></Button>
+
+        <Button
+            android:id="@+id/Button05"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:text="5"
+            android:textSize="48px"></Button>
+
+        <Button
+            android:id="@+id/Button06"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:text="6"
+            android:textSize="48px"></Button>
+
+        <Button
+            android:id="@+id/Button07"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:text="7"
+            android:textSize="48px"></Button>
+
+        <Button
+            android:id="@+id/Button08"
+            android:layout_width="@dimen/grid_size"
+            android:layout_height="@dimen/grid_size"
+            android:text="8"
+            android:textSize="48px"></Button>
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/MoveText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/GameField"
+        android:text="@string/moves_title"
+        android:textSize="28px"></TextView>
+
+    <TextView
+        android:id="@+id/FeedbackTitleText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/MoveText"
+        android:text="@string/feedback_title"
+        android:textSize="28px"></TextView>
+
+    <TextView
+        android:id="@+id/MoveCounter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/MoveText"
+        android:layout_below="@+id/GameField"
+        android:layout_marginLeft="5px"
+        android:layout_toRightOf="@+id/MoveText"
+        android:text="0"
+        android:textSize="28px"></TextView>
+
+
+    <TextView
+        android:id="@+id/FeedbackText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/GameField"
+        android:layout_below="@+id/FeedbackTitleText"
+        android:text="@string/game_feedback_text"
+        android:textSize="28px"></TextView>
+</RelativeLayout>

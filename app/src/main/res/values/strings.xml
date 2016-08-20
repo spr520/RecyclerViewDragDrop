@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">NineGridRecyclerView</string>
     <string name="action_settings">Settings</string>
+
+    <string name="play_button">Play</string>
+    <string name="exit">Exit</string>
+    <string name="feedback_title">Feedback: </string>
+    <string name="moves_title">Moves: </string>
+    <string name="game_feedback_text">No feedback yet!</string>
 </resources>
