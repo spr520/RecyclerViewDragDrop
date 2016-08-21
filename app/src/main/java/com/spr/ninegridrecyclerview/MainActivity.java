@@ -2,7 +2,6 @@ package com.spr.ninegridrecyclerview;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -23,11 +22,17 @@ public class MainActivity extends AppCompatActivity {
     private static final Integer[] goal = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8};
 
     private ArrayList<Integer> cells = new ArrayList<Integer>();
+    int gridPaddingLeft = -1;
+    int gridPaddingTop = -1;
+    int gridSize = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        gridPaddingLeft = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_left);
+        gridPaddingTop = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_top);
+        gridSize = getResources().getDimensionPixelSize(R.dimen.grid_size);
         buttons = findButtons();
 
         for (int i = 0; i < 9; i++) {
@@ -93,9 +98,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     private int _xDelta;
     private int _yDelta;
+
+    private int _startDragX;
+    private int _startDragY;
 
     private final class MyTouchListener implements View.OnTouchListener {
 
@@ -108,10 +115,10 @@ public class MainActivity extends AppCompatActivity {
                     FrameLayout.LayoutParams lParams = (FrameLayout.LayoutParams) view.getLayoutParams();
                     _xDelta = X - lParams.leftMargin;
                     _yDelta = Y - lParams.topMargin;
-                    Log.d("Spr","ACTION_DOWN");
+                    _startDragX = lParams.leftMargin;
+                    _startDragY = lParams.topMargin;
                     break;
                 case MotionEvent.ACTION_UP:
-                    Log.d("Spr","ACTION_UP");
                     makeMove((Button) view);
                     if(bad_move) {
                         // reset to org position
@@ -123,16 +130,20 @@ public class MainActivity extends AppCompatActivity {
                 case MotionEvent.ACTION_POINTER_UP:
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    Log.d("Spr","ACTION_MOVE X =" + X);
                     if(!isAllowMove((Button) view)) {
                         return true;
                     }
 
                     FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
-                    int move_x = X - _xDelta;
-                    int move_y = Y - _yDelta;
-                    layoutParams.leftMargin = X - _xDelta;
-                    layoutParams.topMargin = Y - _yDelta;
+                    int newX = X - _xDelta;
+                    int newY = Y - _yDelta;
+
+                    calcLeftMargin(_startDragX, newX, layoutParams);
+//                        layoutParams.leftMargin = X - _xDelta;
+
+//
+                    calcTopMargin(_startDragY, newY, layoutParams);
+//                         layoutParams.topMargin = Y - _yDelta;
 //                    layoutParams.rightMargin = -250;
 //                    layoutParams.bottomMargin = -250;
                     view.setLayoutParams(layoutParams);
@@ -141,34 +152,69 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     }
-    /*
-        public boolean onTouch(View view, MotionEvent event) {
-            final int X = (int) event.getRawX();
-            final int Y = (int) event.getRawY();
-            switch (event.getAction() & MotionEvent.ACTION_MASK) {
-                case MotionEvent.ACTION_DOWN:
-                    RelativeLayout.LayoutParams lParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-                    _xDelta = X - lParams.leftMargin;
-                    _yDelta = Y - lParams.topMargin;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    break;
-                case MotionEvent.ACTION_POINTER_DOWN:
-                    break;
-                case MotionEvent.ACTION_POINTER_UP:
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) view.getLayoutParams();
-                    layoutParams.leftMargin = X - _xDelta;
-                    layoutParams.topMargin = Y - _yDelta;
-                    layoutParams.rightMargin = -250;
-                    layoutParams.bottomMargin = -250;
-                    view.setLayoutParams(layoutParams);
-                    break;
+    private void calcLeftMargin(int startDragX, int targetX , FrameLayout.LayoutParams buttonParams) {
+
+        FrameLayout.LayoutParams buttonOParams = (FrameLayout.LayoutParams)buttons[0].getLayoutParams();
+        int button0X = buttonOParams.leftMargin;
+
+        int moveOffsetX = targetX - startDragX;
+        int allowOffset = button0X - startDragX;
+
+        if (allowOffset > 0 && moveOffsetX > 0) {
+            if (allowOffset > moveOffsetX) {
+                buttonParams.leftMargin = targetX;
+            } else {
+                buttonParams.leftMargin = button0X;
             }
-            return true;
+        } else if ( allowOffset > 0 && moveOffsetX < 0) {
+            buttonParams.leftMargin = startDragX;
         }
-    */
+
+        if (allowOffset < 0 && moveOffsetX < 0) {
+            if (allowOffset < moveOffsetX) {
+                buttonParams.leftMargin = targetX;
+            } else {
+                buttonParams.leftMargin = button0X;
+            }
+        } else if ( allowOffset < 0 && moveOffsetX > 0) {
+            buttonParams.leftMargin = startDragX;
+        }
+
+
+    }
+
+    private void calcTopMargin(int startDragY, int targetY , FrameLayout.LayoutParams buttonParams) {
+
+        FrameLayout.LayoutParams buttonOParams = (FrameLayout.LayoutParams)buttons[0].getLayoutParams();
+        int button0Y = buttonOParams.topMargin;
+
+        int moveOffsetY = targetY - startDragY;
+        int allowOffset = button0Y - startDragY;
+
+        if (allowOffset > 0 && moveOffsetY > 0) {
+            if (allowOffset > moveOffsetY) {
+                buttonParams.topMargin = targetY;
+            } else {
+                buttonParams.topMargin = button0Y;
+            }
+        } else if ( allowOffset > 0 && moveOffsetY < 0) {
+            buttonParams.topMargin = startDragY;
+        }
+
+        if (allowOffset < 0 && moveOffsetY < 0) {
+            if (allowOffset < moveOffsetY) {
+                buttonParams.topMargin = targetY;
+            } else {
+                buttonParams.topMargin = button0Y;
+            }
+        } else if ( allowOffset < 0 && moveOffsetY > 0) {
+            buttonParams.topMargin = startDragY;
+        }
+
+
+    }
+
+
     public Button[] findButtons() {
         Button[] b = new Button[9];
 
@@ -300,9 +346,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void fill_grid() {
-        int gridPaddingLeft = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_left);
-        int gridPaddingTop = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_top);
-        int cellSize = getResources().getDimensionPixelSize(R.dimen.grid_size);
         for (int i = 0; i < 9; i++) {
             int text = cells.get(i);
             FrameLayout.LayoutParams absParams =
@@ -316,50 +359,50 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case (1):
 
-                    absParams.leftMargin = gridPaddingLeft + cellSize;
+                    absParams.leftMargin = gridPaddingLeft + gridSize;
                     absParams.topMargin = gridPaddingTop;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (2):
 
-                    absParams.leftMargin = gridPaddingLeft + cellSize * 2;
+                    absParams.leftMargin = gridPaddingLeft + gridSize * 2;
                     absParams.topMargin = gridPaddingTop;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (3):
 
                     absParams.leftMargin = gridPaddingLeft;
-                    absParams.topMargin = gridPaddingTop + cellSize;
+                    absParams.topMargin = gridPaddingTop + gridSize;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (4):
 
-                    absParams.leftMargin = gridPaddingLeft + cellSize;
-                    absParams.topMargin = gridPaddingTop + cellSize;
+                    absParams.leftMargin = gridPaddingLeft + gridSize;
+                    absParams.topMargin = gridPaddingTop + gridSize;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (5):
 
-                    absParams.leftMargin = gridPaddingLeft + cellSize * 2;
-                    absParams.topMargin = gridPaddingTop + cellSize;
+                    absParams.leftMargin = gridPaddingLeft + gridSize * 2;
+                    absParams.topMargin = gridPaddingTop + gridSize;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (6):
 
                     absParams.leftMargin = gridPaddingLeft;
-                    absParams.topMargin = gridPaddingTop + cellSize * 2;
+                    absParams.topMargin = gridPaddingTop + gridSize * 2;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (7):
 
-                    absParams.leftMargin = gridPaddingLeft + cellSize;
-                    absParams.topMargin = gridPaddingTop  + cellSize * 2;
+                    absParams.leftMargin = gridPaddingLeft + gridSize;
+                    absParams.topMargin = gridPaddingTop  + gridSize * 2;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (8):
 
-                    absParams.leftMargin = gridPaddingLeft + cellSize * 2;
-                    absParams.topMargin = gridPaddingTop + cellSize * 2;
+                    absParams.leftMargin = gridPaddingLeft + gridSize * 2;
+                    absParams.topMargin = gridPaddingTop + gridSize * 2;
                     buttons[text].setLayoutParams(absParams);
                     break;
 
