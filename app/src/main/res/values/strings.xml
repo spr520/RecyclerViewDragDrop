@@ -6,5 +6,6 @@
     <string name="exit">Exit</string>
     <string name="feedback_title">Feedback: </string>
     <string name="moves_title">Moves: </string>
+    <string name="time_title">Spend Time :</string>
     <string name="game_feedback_text">No feedback yet!</string>
 </resources>

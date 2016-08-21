@@ -80,7 +80,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/GameField"
-        android:text="@string/moves_title"
+        android:text="@string/time_title"
         android:textSize="28px"></TextView>
 
     <TextView
@@ -92,7 +92,7 @@
         android:textSize="28px"></TextView>
 
     <TextView
-        android:id="@+id/MoveCounter"
+        android:id="@+id/Timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/MoveText"

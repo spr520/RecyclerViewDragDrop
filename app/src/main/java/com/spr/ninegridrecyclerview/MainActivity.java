@@ -1,8 +1,6 @@
 package com.spr.ninegridrecyclerview;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -24,13 +24,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Spr";
     public static final int NUM_COLUMNS = 3;
 
-    private TextView moveCounter;
+    private TextView timerText;
     private TextView feedbackText;
     private Button[] buttons;
     private Boolean bad_move = false;
@@ -45,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
     private int PHOTO_RESULT_CODE = 100;
     private Context mContext;
 
+    private int tsec=0,csec=0,cmin=0;
+    private boolean startflag=false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,42 +63,74 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < 9; i++) {
             this.cells.add(i);
         }
-        randomCell();
+//        randomCell();
 
 
-        moveCounter = (TextView) findViewById(R.id.MoveCounter);
+        timerText = (TextView) findViewById(R.id.Timer);
         feedbackText = (TextView) findViewById(R.id.FeedbackText);
 
         for (int i = 1; i < 9; i++) {
-            /*
-            buttons[i].setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    makeMove((Button) v);
-                }
-            });
-            */
-
             buttons[i].setOnTouchListener(new MyTouchListener());
         }
 
 
-        moveCounter.setText("0");
+        timerText.setText("0");
         feedbackText.setText(R.string.game_feedback_text);
 
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+        Timer timer01 =new Timer();
+        timer01.schedule(task, 0,1000);
+        startflag = false;
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
                 startPhotoSelect();
             }
         });
 
     }
+
+    private TimerTask task = new TimerTask() {
+
+        @Override
+        public void run() {
+            if (startflag){
+                tsec++;
+                Message message = new Message();
+                message.what =1;
+                handler.sendMessage(message);
+            }
+
+        }
+    };
+
+    private Handler handler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch(msg.what) {
+                case 1:
+                    csec=tsec%60;
+                    cmin=tsec/60;
+                    String s="";
+                    if(cmin <10){
+                        s="0"+cmin;
+                    }else{
+                        s=""+cmin;
+                    }
+                    if(csec < 10){
+                        s=s+":0"+csec;
+                    }else{
+                        s=s+":"+csec;
+                    }
+                    timerText.setText(s);
+                    break;
+
+            }
+        }
+    };
 
     private void randomCell() {
         Collections.shuffle(this.cells); //random cells array
@@ -121,6 +158,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         fill_grid();
+        tsec=0;
+        timerText.setText("00:00");
+        startflag = true;
     }
 
     private void startPhotoSelect() {
@@ -229,11 +269,8 @@ public class MainActivity extends AppCompatActivity {
                     int newY = Y - _yDelta;
 
                     calcLeftMargin(_startDragX, newX, layoutParams);
-//                        layoutParams.leftMargin = X - _xDelta;
 
-//
                     calcTopMargin(_startDragY, newY, layoutParams);
-//                         layoutParams.topMargin = Y - _yDelta;
                     view.setLayoutParams(layoutParams);
                     break;
             }
@@ -438,13 +475,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         fill_grid();
-        moveCounter.setText(Integer.toString(Integer.parseInt((String) moveCounter.getText()) + 1));
 
         for (int i = 0; i < 8; i++) {
             if (cells.get(i) != goal[i + 1]) {
                 return;
             }
         }
+        startflag=false;
         feedbackText.setText("we have a winner");
     }
 
