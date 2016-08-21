@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +26,7 @@ import java.util.Collections;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "Spr";
+    public static final int NUM_COLUMNS = 3;
 
     private TextView moveCounter;
     private TextView feedbackText;
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> cells = new ArrayList<Integer>();
     int gridPaddingLeft = -1;
     int gridPaddingTop = -1;
-    int gridSize = -1;
+    int gridPixel = -1;
 
     // lunch photo
     private int PHOTO_RESULT_CODE = 100;
@@ -50,16 +49,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         gridPaddingLeft = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_left);
         gridPaddingTop = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_top);
-        gridSize = getResources().getDimensionPixelSize(R.dimen.grid_size);
+        gridPixel = getResources().getDimensionPixelSize(R.dimen.grid_size);
         buttons = findButtons();
         mContext = getApplicationContext();
 
         for (int i = 0; i < 9; i++) {
             this.cells.add(i);
         }
-        Collections.shuffle(this.cells); //random cells array
-
-        fill_grid();
+        randomCell();
 
 
         moveCounter = (TextView) findViewById(R.id.MoveCounter);
@@ -94,6 +91,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void randomCell() {
+        Collections.shuffle(this.cells); //random cells array
+
+        //check order
+        int count = 0;
+        for (int i = 0; i < 9; i++) {
+            for (int j = i; j < 9; j++) {
+                if(cells.get(i) > cells.get(j)) {
+                    count++;
+                }
+            }
+            if(cells.get(i) == 0) {
+                count += (i % NUM_COLUMNS) + (i / NUM_COLUMNS);
+            }
+        }
+        Log.d(TAG,"before re-order cells= " + cells);
+        if((count % 2)== 1) {
+            Log.d(TAG," re-order");
+            int tmp = cells.get(8);
+            cells.set(8, cells.get(6));
+            cells.set(6, tmp);
+        }
+        Log.d(TAG,"after re-order cells= " + cells);
+
+
+        fill_grid();
     }
 
     private void startPhotoSelect() {
@@ -136,14 +161,14 @@ public class MainActivity extends AppCompatActivity {
         int squareX = (srcWidth - squareLength) / 2;
         int squareY = (srcHeight - squareLength) / 2;
         Bitmap squareBitmap = Bitmap.createBitmap(srcBitmap, squareX, squareY , squareLength, squareLength);
-        squareBitmap = Bitmap.createScaledBitmap(squareBitmap, gridSize * 3, gridSize * 3, true);
+        squareBitmap = Bitmap.createScaledBitmap(squareBitmap, gridPixel * 3, gridPixel * 3, true);
 
         for (int i = 1; i < 9; i++) {
             int index = i - 1;
-            int x = (index % 3) * gridSize;
-            int y = (index / 3) * gridSize;
-            int width = gridSize;
-            int height = gridSize;
+            int x = (index % 3) * gridPixel;
+            int y = (index / 3) * gridPixel;
+            int width = gridPixel;
+            int height = gridPixel;
             Bitmap gridBitmap = Bitmap.createBitmap(squareBitmap, x, y, width, height);
 
 
@@ -151,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
+        randomCell();
     }
 
     private int _xDelta;
@@ -219,8 +245,8 @@ public class MainActivity extends AppCompatActivity {
         int targetX = params.leftMargin;
         int targetY = params.topMargin;
 
-        if (Math.abs(startDragX - targetX) > (gridSize / 2) ||
-                Math.abs(startDragY - targetY) > (gridSize / 2)) {
+        if (Math.abs(startDragX - targetX) > (gridPixel / 2) ||
+                Math.abs(startDragY - targetY) > (gridPixel / 2)) {
             isAllowChange = true;
         }
 
@@ -434,50 +460,50 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case (1):
 
-                    absParams.leftMargin = gridPaddingLeft + gridSize;
+                    absParams.leftMargin = gridPaddingLeft + gridPixel;
                     absParams.topMargin = gridPaddingTop;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (2):
 
-                    absParams.leftMargin = gridPaddingLeft + gridSize * 2;
+                    absParams.leftMargin = gridPaddingLeft + gridPixel * 2;
                     absParams.topMargin = gridPaddingTop;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (3):
 
                     absParams.leftMargin = gridPaddingLeft;
-                    absParams.topMargin = gridPaddingTop + gridSize;
+                    absParams.topMargin = gridPaddingTop + gridPixel;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (4):
 
-                    absParams.leftMargin = gridPaddingLeft + gridSize;
-                    absParams.topMargin = gridPaddingTop + gridSize;
+                    absParams.leftMargin = gridPaddingLeft + gridPixel;
+                    absParams.topMargin = gridPaddingTop + gridPixel;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (5):
 
-                    absParams.leftMargin = gridPaddingLeft + gridSize * 2;
-                    absParams.topMargin = gridPaddingTop + gridSize;
+                    absParams.leftMargin = gridPaddingLeft + gridPixel * 2;
+                    absParams.topMargin = gridPaddingTop + gridPixel;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (6):
 
                     absParams.leftMargin = gridPaddingLeft;
-                    absParams.topMargin = gridPaddingTop + gridSize * 2;
+                    absParams.topMargin = gridPaddingTop + gridPixel * 2;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (7):
 
-                    absParams.leftMargin = gridPaddingLeft + gridSize;
-                    absParams.topMargin = gridPaddingTop  + gridSize * 2;
+                    absParams.leftMargin = gridPaddingLeft + gridPixel;
+                    absParams.topMargin = gridPaddingTop  + gridPixel * 2;
                     buttons[text].setLayoutParams(absParams);
                     break;
                 case (8):
 
-                    absParams.leftMargin = gridPaddingLeft + gridSize * 2;
-                    absParams.topMargin = gridPaddingTop + gridSize * 2;
+                    absParams.leftMargin = gridPaddingLeft + gridPixel * 2;
+                    absParams.topMargin = gridPaddingTop + gridPixel * 2;
                     buttons[text].setLayoutParams(absParams);
                     break;
 
