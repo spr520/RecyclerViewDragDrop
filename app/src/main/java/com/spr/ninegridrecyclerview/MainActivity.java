@@ -1,19 +1,33 @@
 package com.spr.ninegridrecyclerview;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = "Spr";
 
     private TextView moveCounter;
     private TextView feedbackText;
@@ -26,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
     int gridPaddingTop = -1;
     int gridSize = -1;
 
+    // lunch photo
+    private int PHOTO_RESULT_CODE = 100;
+    private Context mContext;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
         gridPaddingTop = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_top);
         gridSize = getResources().getDimensionPixelSize(R.dimen.grid_size);
         buttons = findButtons();
+        mContext = getApplicationContext();
 
         for (int i = 0; i < 9; i++) {
             this.cells.add(i);
@@ -61,41 +80,77 @@ public class MainActivity extends AppCompatActivity {
 
         moveCounter.setText("0");
         feedbackText.setText(R.string.game_feedback_text);
-        /*
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+                startPhotoSelect();
             }
         });
-        */
+
+    }
+
+    private void startPhotoSelect() {
+        Intent launchIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        launchIntent.setType("image/*");
+        startActivityForResult(launchIntent, PHOTO_RESULT_CODE);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == PHOTO_RESULT_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                if (data != null && data.getData() != null) {
+                    final Uri uri = data.getData();
+                    if(uri != null) {
+                        try {
+                            InputStream is = mContext.getContentResolver().openInputStream(uri);
+                            Bitmap srcBitmap = BitmapFactory.decodeStream(is);
+                            fillGridPhoto(srcBitmap);
+                            try {
+                                is.close();
+                            } catch (IOException t) {
+                                Log.w(TAG, "Failed close input strean, uri=" + uri);
+                            }
+                        } catch (FileNotFoundException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                }
+
+            }
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+    private void fillGridPhoto(Bitmap srcBitmap) {
+        int srcHeight = srcBitmap.getHeight();
+        int srcWidth = srcBitmap.getWidth();
+        int squareLength = srcHeight > srcWidth ? srcWidth : srcHeight;
+        int squareX = (srcWidth - squareLength) / 2;
+        int squareY = (srcHeight - squareLength) / 2;
+        Bitmap squareBitmap = Bitmap.createBitmap(srcBitmap, squareX, squareY , squareLength, squareLength);
+        squareBitmap = Bitmap.createScaledBitmap(squareBitmap, gridSize * 3, gridSize * 3, true);
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        for (int i = 1; i < 9; i++) {
+            int index = i - 1;
+            int x = (index % 3) * gridSize;
+            int y = (index / 3) * gridSize;
+            int width = gridSize;
+            int height = gridSize;
+            Bitmap gridBitmap = Bitmap.createBitmap(squareBitmap, x, y, width, height);
+
+
+            buttons[i].setBackground(new BitmapDrawable(mContext.getResources(), gridBitmap));
+
         }
 
-        return super.onOptionsItemSelected(item);
     }
 
     private int _xDelta;
@@ -151,8 +206,6 @@ public class MainActivity extends AppCompatActivity {
 //
                     calcTopMargin(_startDragY, newY, layoutParams);
 //                         layoutParams.topMargin = Y - _yDelta;
-//                    layoutParams.rightMargin = -250;
-//                    layoutParams.bottomMargin = -250;
                     view.setLayoutParams(layoutParams);
                     break;
             }
