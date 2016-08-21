@@ -1,6 +1,8 @@
 package com.spr.ninegridrecyclerview;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -438,8 +440,8 @@ public class MainActivity extends AppCompatActivity {
         fill_grid();
         moveCounter.setText(Integer.toString(Integer.parseInt((String) moveCounter.getText()) + 1));
 
-        for (int i = 0; i < 9; i++) {
-            if (cells.get(i) != goal[i]) {
+        for (int i = 0; i < 8; i++) {
+            if (cells.get(i) != goal[i + 1]) {
                 return;
             }
         }
