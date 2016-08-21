@@ -119,8 +119,15 @@ public class MainActivity extends AppCompatActivity {
                     _startDragY = lParams.topMargin;
                     break;
                 case MotionEvent.ACTION_UP:
-                    makeMove((Button) view);
-                    if(bad_move) {
+                    if (isAllowChangePos(_startDragX, _startDragY, (Button) view)) {
+                        makeMove((Button) view);
+                    } else {
+                        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
+                        layoutParams.leftMargin = _startDragX;
+                        layoutParams.topMargin = _startDragY;
+                        view.setLayoutParams(layoutParams);
+                    }
+                    if (bad_move) {
                         // reset to org position
 
                     }
@@ -152,6 +159,21 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
     }
+
+    private boolean isAllowChangePos(int startDragX , int startDragY, Button button) {
+        boolean isAllowChange = false;
+        FrameLayout.LayoutParams params = (FrameLayout.LayoutParams)button.getLayoutParams();
+        int targetX = params.leftMargin;
+        int targetY = params.topMargin;
+
+        if (Math.abs(startDragX - targetX) > (gridSize / 2) ||
+                Math.abs(startDragY - targetY) > (gridSize / 2)) {
+            isAllowChange = true;
+        }
+
+        return isAllowChange;
+    }
+
     private void calcLeftMargin(int startDragX, int targetX , FrameLayout.LayoutParams buttonParams) {
 
         FrameLayout.LayoutParams buttonOParams = (FrameLayout.LayoutParams)buttons[0].getLayoutParams();
