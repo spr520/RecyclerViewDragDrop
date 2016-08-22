@@ -109,7 +109,6 @@
         android:layout_height="wrap_content"
         android:layout_alignRight="@+id/GameField"
         android:layout_below="@+id/FeedbackTitleText"
-        android:text="@string/game_feedback_text"
         android:textSize="28px"></TextView>
 
     <ImageView

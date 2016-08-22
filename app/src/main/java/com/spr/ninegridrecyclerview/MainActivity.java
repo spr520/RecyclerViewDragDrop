@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.FileNotFoundException;
@@ -54,6 +55,8 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageView thumbnailView;
     private Bitmap grid0Bitmap;
+    private TextView welcomeTextView;
+    private RelativeLayout gameLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,17 +77,18 @@ public class MainActivity extends AppCompatActivity {
         timerText = (TextView) findViewById(R.id.Timer);
         feedbackText = (TextView) findViewById(R.id.FeedbackText);
         thumbnailView = (ImageView) findViewById(R.id.thumbnail);
+        welcomeTextView = (TextView) findViewById(R.id.welcometext);
+        gameLayout = (RelativeLayout) findViewById(R.id.Game);
 
         for (int i = 1; i < 9; i++) {
             buttons[i].setOnTouchListener(new MyTouchListener());
         }
 
 
-        timerText.setText("0");
-        feedbackText.setText(R.string.game_feedback_text);
+//        feedbackText.setText(R.string.game_feedback_text);
 
-        Timer timer01 =new Timer();
-        timer01.schedule(task, 0,1000);
+        Timer timer01 = new Timer();
+        timer01.schedule(task, 0, 1000);
         startflag = false;
 
 
@@ -167,6 +171,8 @@ public class MainActivity extends AppCompatActivity {
         tsec=0;
         timerText.setText("00:00");
         startflag = true;
+        welcomeTextView.setVisibility(View.INVISIBLE);
+        gameLayout.setVisibility(View.VISIBLE);
     }
 
     private void startPhotoSelect() {
@@ -183,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                     final Uri uri = data.getData();
                     if(uri != null) {
                         try {
-                            InputStream is = mContext.getContentResolver().openInputStream(uri);
+                            InputStream is = getContentResolver().openInputStream(uri);
                             Bitmap srcBitmap = BitmapFactory.decodeStream(is);
                             fillGridPhoto(srcBitmap);
                             try {

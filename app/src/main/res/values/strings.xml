@@ -8,4 +8,5 @@
     <string name="moves_title">Moves: </string>
     <string name="time_title">Spend Time :</string>
     <string name="game_feedback_text">No feedback yet!</string>
+    <string name="welcome_text">Tap floating Button and Select a photo to start game</string>
 </resources>
