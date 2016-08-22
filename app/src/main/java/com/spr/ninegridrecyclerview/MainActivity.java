@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView timerText;
     private TextView feedbackText;
-    private Button[] buttons;
-    private Boolean bad_move = false;
+    private Button[] mButtons;
+    private Boolean mBadMove = false;
     private static final Integer[] goal = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8};
 
     private ArrayList<Integer> cells = new ArrayList<Integer>();
@@ -65,13 +65,12 @@ public class MainActivity extends AppCompatActivity {
         gridPaddingLeft = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_left);
         gridPaddingTop = getResources().getDimensionPixelSize(R.dimen.grid_layout_padding_top);
         gridPixel = getResources().getDimensionPixelSize(R.dimen.grid_size);
-        buttons = findButtons();
+        mButtons = findButtons();
         mContext = getApplicationContext();
 
         for (int i = 0; i < 9; i++) {
             this.cells.add(i);
         }
-//        randomCell();
 
 
         timerText = (TextView) findViewById(R.id.Timer);
@@ -81,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
         gameLayout = (RelativeLayout) findViewById(R.id.Game);
 
         for (int i = 1; i < 9; i++) {
-            buttons[i].setOnTouchListener(new MyTouchListener());
+            mButtons[i].setOnTouchListener(new MyTouchListener());
         }
 
 
@@ -231,44 +230,46 @@ public class MainActivity extends AppCompatActivity {
             Bitmap gridBitmap = Bitmap.createBitmap(squareBitmap, x, y, width, height);
 
 
-            buttons[i].setBackground(new BitmapDrawable(getResources(), gridBitmap));
+            mButtons[i].setBackground(new BitmapDrawable(getResources(), gridBitmap));
 
         }
-        buttons[0].setBackgroundColor(Color.TRANSPARENT);
+        mButtons[0].setBackgroundColor(Color.TRANSPARENT);
 
         randomCell();
     }
 
-    private int _xDelta;
-    private int _yDelta;
+    private int mXDelta;
+    private int mYDelta;
 
-    private int _startDragX;
-    private int _startDragY;
+    private int mStartDragX;
+    private int mStartDragY;
 
     private final class MyTouchListener implements View.OnTouchListener {
 
         @Override
         public boolean onTouch(View view, MotionEvent event) {
+            if(!startflag)
+                return true;
             final int X = (int) event.getRawX();
             final int Y = (int) event.getRawY();
             switch (event.getAction() & MotionEvent.ACTION_MASK) {
                 case MotionEvent.ACTION_DOWN:
                     FrameLayout.LayoutParams lParams = (FrameLayout.LayoutParams) view.getLayoutParams();
-                    _xDelta = X - lParams.leftMargin;
-                    _yDelta = Y - lParams.topMargin;
-                    _startDragX = lParams.leftMargin;
-                    _startDragY = lParams.topMargin;
+                    mXDelta = X - lParams.leftMargin;
+                    mYDelta = Y - lParams.topMargin;
+                    mStartDragX = lParams.leftMargin;
+                    mStartDragY = lParams.topMargin;
                     break;
                 case MotionEvent.ACTION_UP:
-                    if (isAllowChangePos(_startDragX, _startDragY, (Button) view)) {
+                    if (isAllowChangePos(mStartDragX, mStartDragY, (Button) view)) {
                         makeMove((Button) view);
                     } else {
                         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
-                        layoutParams.leftMargin = _startDragX;
-                        layoutParams.topMargin = _startDragY;
+                        layoutParams.leftMargin = mStartDragX;
+                        layoutParams.topMargin = mStartDragY;
                         view.setLayoutParams(layoutParams);
                     }
-                    if (bad_move) {
+                    if (mBadMove) {
                         // reset to org position
 
                     }
@@ -283,12 +284,12 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
-                    int newX = X - _xDelta;
-                    int newY = Y - _yDelta;
+                    int newX = X - mXDelta;
+                    int newY = Y - mYDelta;
 
-                    calcLeftMargin(_startDragX, newX, layoutParams);
+                    calcLeftMargin(mStartDragX, newX, layoutParams);
 
-                    calcTopMargin(_startDragY, newY, layoutParams);
+                    calcTopMargin(mStartDragY, newY, layoutParams);
                     view.setLayoutParams(layoutParams);
                     break;
             }
@@ -312,7 +313,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void calcLeftMargin(int startDragX, int targetX , FrameLayout.LayoutParams buttonParams) {
 
-        FrameLayout.LayoutParams buttonOParams = (FrameLayout.LayoutParams)buttons[0].getLayoutParams();
+        FrameLayout.LayoutParams buttonOParams = (FrameLayout.LayoutParams) mButtons[0].getLayoutParams();
         int button0X = buttonOParams.leftMargin;
 
         int moveOffsetX = targetX - startDragX;
@@ -343,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void calcTopMargin(int startDragY, int targetY , FrameLayout.LayoutParams buttonParams) {
 
-        FrameLayout.LayoutParams buttonOParams = (FrameLayout.LayoutParams)buttons[0].getLayoutParams();
+        FrameLayout.LayoutParams buttonOParams = (FrameLayout.LayoutParams) mButtons[0].getLayoutParams();
         int button0Y = buttonOParams.topMargin;
 
         int moveOffsetY = targetY - startDragY;
@@ -389,46 +390,46 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean isAllowMove(final Button b) {
-        int b_text, b_pos, zuk_pos;
+        int buttonText, buttonPos, emptyPos;
         boolean isAllowMove = false;
-        b_text = Integer.parseInt((String) b.getText());
-        b_pos = find_pos(b_text);
-        zuk_pos = find_pos(0);
-        switch (zuk_pos) {
+        buttonText = Integer.parseInt((String) b.getText());
+        buttonPos = findPos(buttonText);
+        emptyPos = findPos(0);
+        switch (emptyPos) {
             case (0):
-                if (b_pos == 1 || b_pos == 3)
+                if (buttonPos == 1 || buttonPos == 3)
                     isAllowMove = true;
                 break;
             case (1):
-                if (b_pos == 0 || b_pos == 2 || b_pos == 4)
+                if (buttonPos == 0 || buttonPos == 2 || buttonPos == 4)
                     isAllowMove = true;
                 break;
             case (2):
-                if (b_pos == 1 || b_pos == 5)
+                if (buttonPos == 1 || buttonPos == 5)
                     isAllowMove = true;
                 break;
             case (3):
-                if (b_pos == 0 || b_pos == 4 || b_pos == 6)
+                if (buttonPos == 0 || buttonPos == 4 || buttonPos == 6)
                     isAllowMove = true;
                 break;
             case (4):
-                if (b_pos == 1 || b_pos == 3 || b_pos == 5 || b_pos == 7)
+                if (buttonPos == 1 || buttonPos == 3 || buttonPos == 5 || buttonPos == 7)
                     isAllowMove = true;
                 break;
             case (5):
-                if (b_pos == 2 || b_pos == 4 || b_pos == 8)
+                if (buttonPos == 2 || buttonPos == 4 || buttonPos == 8)
                     isAllowMove = true;
                 break;
             case (6):
-                if (b_pos == 3 || b_pos == 7)
+                if (buttonPos == 3 || buttonPos == 7)
                     isAllowMove = true;
                 break;
             case (7):
-                if (b_pos == 4 || b_pos == 6 || b_pos == 8)
+                if (buttonPos == 4 || buttonPos == 6 || buttonPos == 8)
                     isAllowMove = true;
                 break;
             case (8):
-                if (b_pos == 5 || b_pos == 7)
+                if (buttonPos == 5 || buttonPos == 7)
                     isAllowMove = true;
                 break;
         }
@@ -436,51 +437,51 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void makeMove(final Button b) {
-        bad_move = true;
+        mBadMove = true;
         int b_text, b_pos, zuk_pos;
         b_text = Integer.parseInt((String) b.getText());
-        b_pos = find_pos(b_text);
-        zuk_pos = find_pos(0);
+        b_pos = findPos(b_text);
+        zuk_pos = findPos(0);
         switch (zuk_pos) {
             case (0):
                 if (b_pos == 1 || b_pos == 3)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
             case (1):
                 if (b_pos == 0 || b_pos == 2 || b_pos == 4)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
             case (2):
                 if (b_pos == 1 || b_pos == 5)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
             case (3):
                 if (b_pos == 0 || b_pos == 4 || b_pos == 6)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
             case (4):
                 if (b_pos == 1 || b_pos == 3 || b_pos == 5 || b_pos == 7)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
             case (5):
                 if (b_pos == 2 || b_pos == 4 || b_pos == 8)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
             case (6):
                 if (b_pos == 3 || b_pos == 7)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
             case (7):
                 if (b_pos == 4 || b_pos == 6 || b_pos == 8)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
             case (8):
                 if (b_pos == 5 || b_pos == 7)
-                    bad_move = false;
+                    mBadMove = false;
                 break;
         }
 
-        if (bad_move == true) {
+        if (mBadMove == true) {
             feedbackText.setText("Move Not Allowed");
             return;
         } else {
@@ -501,68 +502,68 @@ public class MainActivity extends AppCompatActivity {
         }
         startflag=false;
         feedbackText.setText("we have a winner");
-        buttons[0].setBackground(new BitmapDrawable(getResources(), grid0Bitmap));
+        mButtons[0].setBackground(new BitmapDrawable(getResources(), grid0Bitmap));
     }
 
     public void fill_grid() {
         for (int i = 0; i < 9; i++) {
             int text = cells.get(i);
             FrameLayout.LayoutParams absParams =
-                    (FrameLayout.LayoutParams) buttons[text].getLayoutParams();
+                    (FrameLayout.LayoutParams) mButtons[text].getLayoutParams();
             switch (i) {
                 case (0):
 
                     absParams.leftMargin = gridPaddingLeft;
                     absParams.topMargin = gridPaddingTop;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
                 case (1):
 
                     absParams.leftMargin = gridPaddingLeft + gridPixel;
                     absParams.topMargin = gridPaddingTop;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
                 case (2):
 
                     absParams.leftMargin = gridPaddingLeft + gridPixel * 2;
                     absParams.topMargin = gridPaddingTop;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
                 case (3):
 
                     absParams.leftMargin = gridPaddingLeft;
                     absParams.topMargin = gridPaddingTop + gridPixel;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
                 case (4):
 
                     absParams.leftMargin = gridPaddingLeft + gridPixel;
                     absParams.topMargin = gridPaddingTop + gridPixel;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
                 case (5):
 
                     absParams.leftMargin = gridPaddingLeft + gridPixel * 2;
                     absParams.topMargin = gridPaddingTop + gridPixel;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
                 case (6):
 
                     absParams.leftMargin = gridPaddingLeft;
                     absParams.topMargin = gridPaddingTop + gridPixel * 2;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
                 case (7):
 
                     absParams.leftMargin = gridPaddingLeft + gridPixel;
                     absParams.topMargin = gridPaddingTop  + gridPixel * 2;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
                 case (8):
 
                     absParams.leftMargin = gridPaddingLeft + gridPixel * 2;
                     absParams.topMargin = gridPaddingTop + gridPixel * 2;
-                    buttons[text].setLayoutParams(absParams);
+                    mButtons[text].setLayoutParams(absParams);
                     break;
 
 
@@ -573,7 +574,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public int find_pos(int element) {
+    public int findPos(int element) {
         int i = 0;
         for (i = 0; i < 9; i++) {
             if (cells.get(i) == element) {
