@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.FileNotFoundException;
@@ -50,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     private int tsec=0,csec=0,cmin=0;
     private boolean startflag=false;
 
+    private ImageView thumbnailView;
+    private Bitmap grid0Bitmap;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
         timerText = (TextView) findViewById(R.id.Timer);
         feedbackText = (TextView) findViewById(R.id.FeedbackText);
+        thumbnailView = (ImageView) findViewById(R.id.thumbnail);
 
         for (int i = 1; i < 9; i++) {
             buttons[i].setOnTouchListener(new MyTouchListener());
@@ -205,6 +211,11 @@ public class MainActivity extends AppCompatActivity {
         Bitmap squareBitmap = Bitmap.createBitmap(srcBitmap, squareX, squareY , squareLength, squareLength);
         squareBitmap = Bitmap.createScaledBitmap(squareBitmap, gridPixel * 3, gridPixel * 3, true);
 
+        Bitmap thumbnail = Bitmap.createScaledBitmap(squareBitmap, gridPixel, gridPixel, true);
+        thumbnailView.setImageDrawable(new BitmapDrawable(getResources(), thumbnail));
+
+        grid0Bitmap = Bitmap.createBitmap(squareBitmap, gridPixel *2 , gridPixel *2 , gridPixel, gridPixel);
+
         for (int i = 1; i < 9; i++) {
             int index = i - 1;
             int x = (index % 3) * gridPixel;
@@ -214,9 +225,10 @@ public class MainActivity extends AppCompatActivity {
             Bitmap gridBitmap = Bitmap.createBitmap(squareBitmap, x, y, width, height);
 
 
-            buttons[i].setBackground(new BitmapDrawable(mContext.getResources(), gridBitmap));
+            buttons[i].setBackground(new BitmapDrawable(getResources(), gridBitmap));
 
         }
+        buttons[0].setBackgroundColor(Color.TRANSPARENT);
 
         randomCell();
     }
@@ -483,6 +495,7 @@ public class MainActivity extends AppCompatActivity {
         }
         startflag=false;
         feedbackText.setText("we have a winner");
+        buttons[0].setBackground(new BitmapDrawable(getResources(), grid0Bitmap));
     }
 
     public void fill_grid() {

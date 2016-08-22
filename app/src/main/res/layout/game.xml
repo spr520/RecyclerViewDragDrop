@@ -111,4 +111,10 @@
         android:layout_below="@+id/FeedbackTitleText"
         android:text="@string/game_feedback_text"
         android:textSize="28px"></TextView>
+
+    <ImageView
+        android:id="@+id/thumbnail"
+        android:layout_width="@dimen/grid_size"
+        android:layout_height="@dimen/grid_size"
+        android:layout_below="@+id/FeedbackText"/>
 </RelativeLayout>
