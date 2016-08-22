@@ -1,7 +1,9 @@
 package com.spr.ninegridrecyclerview;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -57,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap grid0Bitmap;
     private TextView welcomeTextView;
     private RelativeLayout gameLayout;
+    private String mSpendTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +104,21 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void showSuccessDialog() {
+        String format = getResources().getString(R.string.dialog_message);
+        String message = String.format(format, mSpendTime, mMoveCount);
+
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                }).create().show();
+    }
+
     private TimerTask task = new TimerTask() {
 
         @Override
@@ -135,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
                         s=s+":"+csec;
                     }
                     timerText.setText(s);
+                    mSpendTime = s;
                     break;
 
             }
@@ -169,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
         fill_grid();
         tsec=0;
         timerText.setText("00:00");
+        mMoveCount = 0;
         startflag = true;
         welcomeTextView.setVisibility(View.INVISIBLE);
         gameLayout.setVisibility(View.VISIBLE);
@@ -243,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
 
     private int mStartDragX;
     private int mStartDragY;
+    private int mMoveCount = 0;
 
     private final class MyTouchListener implements View.OnTouchListener {
 
@@ -490,6 +511,7 @@ public class MainActivity extends AppCompatActivity {
             cells.add(b_pos, 0);
             cells.remove(zuk_pos);
             cells.add(zuk_pos, b_text);
+            mMoveCount++;
         }
 
 
@@ -503,6 +525,7 @@ public class MainActivity extends AppCompatActivity {
         startflag=false;
         feedbackText.setText("we have a winner");
         mButtons[0].setBackground(new BitmapDrawable(getResources(), grid0Bitmap));
+        showSuccessDialog();
     }
 
     public void fill_grid() {
