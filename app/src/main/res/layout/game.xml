@@ -77,44 +77,32 @@
     </FrameLayout>
 
     <TextView
-        android:id="@+id/MoveText"
+        android:id="@+id/SpendText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/grid_layout_padding_left"
         android:layout_below="@+id/GameField"
         android:text="@string/time_title"
-        android:textSize="28px"></TextView>
+        android:textSize="28sp"></TextView>
 
-    <TextView
-        android:id="@+id/FeedbackTitleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/MoveText"
-        android:text="@string/feedback_title"
-        android:textSize="28px"></TextView>
 
     <TextView
         android:id="@+id/Timer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/MoveText"
+        android:layout_alignBaseline="@+id/SpendText"
         android:layout_below="@+id/GameField"
         android:layout_marginLeft="5px"
-        android:layout_toRightOf="@+id/MoveText"
+        android:layout_toRightOf="@+id/SpendText"
         android:text="0"
-        android:textSize="28px"></TextView>
+        android:textSize="28sp"></TextView>
 
-
-    <TextView
-        android:id="@+id/FeedbackText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/GameField"
-        android:layout_below="@+id/FeedbackTitleText"
-        android:textSize="28px"></TextView>
 
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="@dimen/grid_size"
         android:layout_height="@dimen/grid_size"
-        android:layout_below="@+id/FeedbackText"/>
+        android:layout_marginTop="@dimen/grid_layout_padding_top"
+        android:layout_marginLeft="@dimen/grid_layout_padding_left"
+        android:layout_below="@+id/SpendText"/>
 </RelativeLayout>

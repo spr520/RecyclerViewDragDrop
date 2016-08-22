@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/AppBarLayout"
         android:layout_marginTop="?attr/actionBarSize"
+        android:layout_marginLeft="@dimen/grid_layout_padding_left"
         android:text="@string/welcome_text"
         android:textSize="24sp"></TextView>
 

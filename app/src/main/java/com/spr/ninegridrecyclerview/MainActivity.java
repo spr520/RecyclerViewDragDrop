@@ -38,7 +38,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int NUM_COLUMNS = 3;
 
     private TextView timerText;
-    private TextView feedbackText;
     private Button[] mButtons;
     private Boolean mBadMove = false;
     private static final Integer[] goal = new Integer[]{0, 1, 2, 3, 4, 5, 6, 7, 8};
@@ -77,17 +76,15 @@ public class MainActivity extends AppCompatActivity {
 
 
         timerText = (TextView) findViewById(R.id.Timer);
-        feedbackText = (TextView) findViewById(R.id.FeedbackText);
         thumbnailView = (ImageView) findViewById(R.id.thumbnail);
         welcomeTextView = (TextView) findViewById(R.id.welcometext);
         gameLayout = (RelativeLayout) findViewById(R.id.Game);
 
         for (int i = 1; i < 9; i++) {
             mButtons[i].setOnTouchListener(new MyTouchListener());
+            mButtons[i].setTextColor(getResources().getColor(android.R.color.transparent, null));
         }
 
-
-//        feedbackText.setText(R.string.game_feedback_text);
 
         Timer timer01 = new Timer();
         timer01.schedule(task, 0, 1000);
@@ -177,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
         }
         Log.d(TAG,"before re-order cells= " + cells);
         if((count % 2)== 1) {
-            Log.d(TAG," re-order");
+            Log.d(TAG,"need re-order");
             int tmp = cells.get(8);
             cells.set(8, cells.get(6));
             cells.set(6, tmp);
@@ -214,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                             try {
                                 is.close();
                             } catch (IOException t) {
-                                Log.w(TAG, "Failed close input strean, uri=" + uri);
+                                Log.w(TAG, "Failed close input stream, uri=" + uri);
                             }
                         } catch (FileNotFoundException ex) {
                             ex.printStackTrace();
@@ -503,10 +500,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if (mBadMove == true) {
-            feedbackText.setText("Move Not Allowed");
             return;
         } else {
-            feedbackText.setText("Move OK");
             cells.remove(b_pos);
             cells.add(b_pos, 0);
             cells.remove(zuk_pos);
@@ -523,7 +518,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         startflag=false;
-        feedbackText.setText("we have a winner");
         mButtons[0].setBackground(new BitmapDrawable(getResources(), grid0Bitmap));
         showSuccessDialog();
     }
